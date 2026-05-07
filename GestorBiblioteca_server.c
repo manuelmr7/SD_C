@@ -36,7 +36,7 @@ static int BuscarPorIsbn(const char *isbn)
 int * conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
 	static int  result;
-	//Verificamos si hay un admin
+	//Verifico si hay un admin
 	if(IdAdmin!=-1)
 	{
 		result=-1;
@@ -73,8 +73,8 @@ bool_t * desconexion_1_svc(int *argp, struct svc_req *rqstp)
 	
 }
 
-/*Función que devuelve TRUE si el libro de la posición P1 está antes que el libro de la posición P2 comparándolo  
- mediante el Campo especificado */
+/*Función que devuelve TRUE si el libro de la posición P1 está antes que el libro de la posición P2 comparándolo
+mediante el campo especificado */
 bool_t EsMenor(int P1, int P2, int Campo)
 {
 	bool_t salida=FALSE;
@@ -83,15 +83,15 @@ bool_t EsMenor(int P1, int P2, int Campo)
 	
 	switch(Campo)
 	{
-		case 0: salida=strcoll(L1.Isbn,L2.Isbn)<0?TRUE:FALSE;
+		case 0: salida=strcmp(L1.Isbn,L2.Isbn)<0?TRUE:FALSE;
 				break; 
-		case 1: salida=strcoll(L1.Titulo,L2.Titulo)<0?TRUE:FALSE;
+		case 1: salida=strcmp(L1.Titulo,L2.Titulo)<0?TRUE:FALSE;
 				break; 
-		case 2: salida=strcoll(L1.Autor,L2.Autor)<0?TRUE:FALSE;
+		case 2: salida=strcmp(L1.Autor,L2.Autor)<0?TRUE:FALSE;
 				break; 
 		case 3: salida=L1.Anio<L2.Anio?TRUE:FALSE;
 				break; 
-		case 4: salida=strcoll(L1.Pais,L2.Pais)<0?TRUE:FALSE;
+		case 4: salida=strcmp(L1.Pais,L2.Pais)<0?TRUE:FALSE;
 				break; 
 		case 5: salida=strcoll(L1.Idioma,L2.Idioma)<0?TRUE:FALSE;
 				break; 
@@ -109,10 +109,10 @@ void OrdenarVector() {
 		return;
 	setlocale(LC_COLLATE, ""); 
     
-    // Método de la burbuja usando EsMenor del profesor
+    // Método de la burbuja usando EsMenor
     for (int i = 0; i < NumLibros - 1; i++) {
         for (int j = 0; j < NumLibros - i - 1; j++) {
-            // Si el de la izquierda NO es menor que el de la derecha, los intercambiamos
+            // Si el de la izquierda no es menor que el de la derecha, los intercambiamos
             if (!EsMenor(j, j + 1, CampoOrdenacion)) {
                 TLibro temp = Biblioteca[j];
                 Biblioteca[j] = Biblioteca[j + 1];
@@ -221,13 +221,13 @@ int *nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 		result=-1;
 		return &result;
 	}
-	//Verificar que ISBN no está duplicado
+	//Verifico que ISBN no está duplicado
 	if(BuscarPorIsbn(argp->Libro.Isbn)>=0)
 	{
 		result=0;
 		return &result;
 	}
-	//Ampliar vector si es necesario
+	//Amplío vector si es necesario
 	if(NumLibros>=Tama)
 	{
 		Tama+=4;
@@ -244,51 +244,6 @@ int *nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 	OrdenarVector();
 	result=1;
 	return &result;
-
-	/*int existe=0;
-	int i=0;
-	bool encontrado=false;
-	if(IdAdmin==-1 || argp->Ida != IdAdmin)
-	{
-		result=-1;
-	}
-	else
-	{
-		while(i<NumLibros && encontrado==false)
-		{
-			if(strcmp(Biblioteca[i].Isbn,argp->Libro.Isbn)==0)
-			{
-				encontrado=true;
-			}
-			i++;
-		}
-	}
-	if(encontrado)
-	{
-		result=0;
-	}
-	else
-	{
-		if(NumLibros==Tama)
-		{
-			Tama=Tama+4;
-			TLibro *aux=(Biblioteca,sizeof(TLibro)+Tama);
-			if(aux==NULL)
-			{
-				fprintf("Error")
-
-			}
-			else
-			{
-				Biblioteca=aux;
-				Biblioteca[NumLibros]=argp->Libro;
-				NumLibros++;
-				OrdenarVector();
-				result=1;
-			}
-		}
-		
-	return &result;*/
 }
 
 int *comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
@@ -306,10 +261,10 @@ int *comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 		result=0;
 		return &result;
 	}
-	//Añadir nuevos ejemplares
+	//Añado nuevos ejemplares
 	Biblioteca[pos].NoLibros+=argp->NoLibros;
 
-	//Satisfacer a todos los usuarios en la lista de espera
+	//Manejo de usuarios en la lista de espera
 	while(Biblioteca[pos].NoListaEspera > 0 && Biblioteca[pos].NoLibros>0)
 	{
 		Biblioteca[pos].NoListaEspera--;
@@ -319,47 +274,6 @@ int *comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 	OrdenarVector();
 	result=1;
 	return &result;
-	/*static int  result;
-	int i=0;
-	int encontrado=0;
-	int pos=-1;
-	if(IdAdmin==-1 || argp->Ida != IdAdmin)
-	{
-		result=-1;
-	}
-	else
-	{
-		while(i<NumLibros && encontrado==0)
-		{
-			if(strcmp(Biblioteca[i].Isbn,argp->Isbn)==0)
-			{
-				encontrado=1;
-				pos=i;
-			}
-			else
-			{
-				i++;
-			}
-		}
-		if(encontrado==0)
-		{
-			result=0;
-		}
-		else
-		{
-			Biblioteca[pos].NoLibros+=argp->NoLibros;
-			while(Biblioteca[pos].NoListaEspera > 0 && Biblioteca[pos].NoLibros>0)
-			{
-				Biblioteca[pos].NoListaEspera;
-				Biblioteca[pos].NoLibros--;
-				Biblioteca[pos].NoPrestados--;
-
-			}
-			OrdenarVector();
-			result=1;
-		}
-	}
-	return &result;*/
 }
 
 int *retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
@@ -400,17 +314,6 @@ bool_t *ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
 	OrdenarVector();
 	result=TRUE;
 	return &result;
-	/*if(IdAdmin == -1 || argp->Ida != IdAdmin || NumLibros==0)
-	{
-		result=FALSE;
-	}
-	else
-	{
-		CampoOrdenacion=argp->Campo;
-		OrdenarVector();
-		result=TRUE;
-	}
-	return &result;*/
 }
 
 int *nlibros_1_svc(int *argp, struct svc_req *rqstp)
@@ -430,28 +333,6 @@ int *buscar_1_svc(TConsulta *argp, struct svc_req *rqstp)
 	}
 	result=BuscarPorIsbn(argp->Isbn);
 	return &result;
-	/*int i=0;
-	int encontrado=0;
-	if(IdAdmin==-1 || argp->Ida != IdAdmin)
-	{
-		result=-2;
-	}
-	else{
-		result=-1; //No se encuentra libro
-		while(i<NumLibros && encontrado==0)
-		{
-			if(strcmp(Biblioteca[i].Isbn,argp->Isbn)==0)
-			{
-				result=i;
-				encontrado=1;
-			}
-			else{
-				i++;
-			}
-		}
-		
-	}
-	return &result;*/
 }
 
 TLibro *descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
@@ -472,37 +353,14 @@ TLibro *descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 
 	}
 	result=Biblioteca[argp->Pos];
-	//Si el IdA no es correcto, ocultar campos sensibles
+	//Si el IdA no es correcto, oculto campos sensibles,
+	//el cliente no tiene por qué saber cómo implemento las cosas en el Servidor
 	if(!IdaValido(argp->Ida))
 	{
 		result.NoPrestados=0;
 		result.NoListaEspera=0;
 	}
 	return &result;
-	/*static TLibro  result;
-	if(argp->Pos < 0 || argp->Pos >= NumLibros)
-	{
-		strcpy(result.Isbn,"????");
-		strcpy(result.Titulo,"????");
-		strcpy(result.Autor,"????");
-		result.Anio=0;
-		strcpy(result.Pais,"????");
-		strcpy(result.Idioma,"????");
-		result.NoLibros=0;
-		result.NoPrestados=0;
-		result.NoListaEspera=0;
-	}
-	else
-	{
-		result=Biblioteca[argp->Pos];
-		if(IdAdmin==-1 || argp->Ida != IdAdmin)
-		{
-			result.NoPrestados=0;
-			result.NoListaEspera=0;
-		}
-	}
-
-	return &result;*/
 }
 
 int *prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
@@ -526,29 +384,6 @@ int *prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 	}
 	OrdenarVector();
 	return &result;
-	/*static int  result;
-	if(argp->Pos<0 || argp->Pos>=NumLibros)
-	{
-		result=-1;
-	}
-	else
-	{
-		if(Biblioteca[argp->Pos].NoLibros>0)
-		{
-			Biblioteca[argp->Pos].NoLibros--;
-			Biblioteca[argp->Pos].NoPrestados++;
-			OrdenarVector();
-			result=1;
-		}
-		else
-		{
-			Biblioteca[argp->Pos].NoListaEspera++;
-			OrdenarVector();
-			result=0;
-		}
-	}
-
-	return &result;*/
 }
 
 int *devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
@@ -579,31 +414,4 @@ int *devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
 	}
 	OrdenarVector();
 	return &result;
-	/*static int  result;
-	if(argp->Pos<0 || argp->Pos>=NumLibros)
-	{
-		result=-1;
-	}
-	else
-	{
-		if(Biblioteca[argp->Pos].NoListaEspera>0)
-		{
-			Biblioteca[argp->Pos].NoListaEspera--;
-			OrdenarVector();
-			result=0;
-		}
-		else if(Biblioteca[argp->Pos].NoPrestados>0)
-		{
-			Biblioteca[argp->Pos].NoPrestados--;
-			Biblioteca[argp->Pos].NoLibros++;
-			OrdenarVector();
-			result=1;
-		}
-		else
-		{
-			result=2;
-		}
-	}
-
-	return &result;*/
 }
