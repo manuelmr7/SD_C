@@ -1,10 +1,3 @@
-/*=============================================================================
- * GestorBiblioteca_cliente.c
- * Implementación del cliente RPC para el Gestor Bibliotecario.
- * Sistemas Distribuidos - Práctica 1 RPC
- *
- * Uso: ./GestorBiblioteca_cliente <hostname_servidor>
- *===========================================================================*/
 #define _GNU_SOURCE
 #include <stdlib.h>
 #include <time.h>
