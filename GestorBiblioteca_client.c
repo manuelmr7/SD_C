@@ -13,19 +13,9 @@
 #include <ctype.h>
 #include <stdio_ext.h>          /* __fpurge */
 #include "GestorBiblioteca.h"
-
-
-/*---------------------------------------------------------------------------
- * Macros de interfaz
- *--------------------------------------------------------------------------*/
 #define Cls             system("clear")
 #define Pause           system("read -p \"Pulsa la tecla return para continuar..... \" a")
 #define MostrarAviso(T) { printf(T); Pause; }
-
-/*===========================================================================
- * Funciones de menú (proporcionadas por el enunciado)
- *=========================================================================*/
-
 int MenuPrincipal(void)
 {
     int Salida;
@@ -71,11 +61,6 @@ int MenuAdministracion(void)
     } while (Salida < 0 || Salida > 8);
     return Salida;
 }
-
-/*===========================================================================
- * Funciones auxiliares de visualización (proporcionadas por el enunciado)
- *=========================================================================*/
-
 /* Rellena Salida con Texto seguido de (Ancho-len) repeticiones de Caracter */
 void Formatea(char *Salida, const char *Texto, int Ancho, char Caracter)
 {
@@ -100,8 +85,6 @@ void Formatea(char *Salida, const char *Texto, int Ancho, char Caracter)
 
     sprintf(Salida, "%s%s", Texto, Vacia);
 }
-
-/* Muestra los campos de un libro con alineación tabular */
 void MostrarLibro(TLibro *L, int Pos, bool_t Cabecera)
 {
     Cadena T, A, B, PI;
@@ -163,17 +146,6 @@ bool_t Comprobar(TLibro *L, Cadena Texto, char Campo)
     }
     return Encontrado;
 }
-
-/*===========================================================================
- * Funciones auxiliares del cliente
- *=========================================================================*/
-
-/*---------------------------------------------------------------------------
- * BuscarYMostrar
- * Descarga todos los libros del servidor y muestra los que coincidan con
- * Texto en el campo Campo.  Devuelve el número de libros mostrados.
- * Si esAdmin==TRUE muestra los campos PRE y RES reales; si no, a 0.
- *--------------------------------------------------------------------------*/
 static int BuscarYMostrar(CLIENT *clnt, int IdAdmin, Cadena Texto, char Campo)
 {
     int     *nlib;
@@ -211,10 +183,6 @@ static int BuscarYMostrar(CLIENT *clnt, int IdAdmin, Cadena Texto, char Campo)
     }
     return mostrados;
 }
-
-/*---------------------------------------------------------------------------
- * MostrarMenuOrdenacion  –  Submenú del campo de ordenación
- *--------------------------------------------------------------------------*/
 static void MostrarMenuOrdenacion(void)
 {
     printf(" Código de Ordenación\n");
@@ -229,10 +197,6 @@ static void MostrarMenuOrdenacion(void)
     printf("  8.- Por nº de libros en espera\n");
     printf(" Introduce Código: ");
 }
-
-/*---------------------------------------------------------------------------
- * MostrarMenuBusqueda  –  Submenú del campo de búsqueda
- *--------------------------------------------------------------------------*/
 static void MostrarMenuBusqueda(void)
 {
     printf(" Código de Búsqueda\n");
@@ -244,10 +208,6 @@ static void MostrarMenuBusqueda(void)
     printf("  *.- Por todos los campos.\n");
     printf(" Introduce Código: ");
 }
-
-/*---------------------------------------------------------------------------
- * MostrarMenuConsulta  –  Submenú del campo de consulta (usuarios normales)
- *--------------------------------------------------------------------------*/
 static void MostrarMenuConsulta(void)
 {
     printf(" Código de Consulta\n");
@@ -259,11 +219,6 @@ static void MostrarMenuConsulta(void)
     printf("  *.- Por todos los campos.\n");
     printf(" Introduce Código: ");
 }
-
-/*===========================================================================
- * Operaciones del Menú de Administración
- *=========================================================================*/
-
 static void OpCargarDatos(CLIENT *clnt, int IdAdmin)
 {
     TFichero datos;
@@ -545,11 +500,6 @@ static void OpListarLibros(CLIENT *clnt, int IdAdmin)
     }
     Pause;
 }
-
-/*===========================================================================
- * Bucle del Menú de Administración
- *=========================================================================*/
-
 static void BucleAdministracion(CLIENT *clnt, int IdAdmin)
 {
     int op;
@@ -572,13 +522,6 @@ static void BucleAdministracion(CLIENT *clnt, int IdAdmin)
     } while (op != 0);
 }
 
-/*===========================================================================
- * Operaciones del Menú Principal
- *=========================================================================*/
-
-/*---------------------------------------------------------------------------
- * OpAdministracion  –  Pedir contraseña, entrar al submenú, desconectar
- *--------------------------------------------------------------------------*/
 static void OpAdministracion(CLIENT *clnt)
 {
     Cadena passwd;
@@ -620,14 +563,11 @@ static void OpAdministracion(CLIENT *clnt)
         clnt_perror(clnt, "Error RPC (Desconexion)");
 }
 
-/*---------------------------------------------------------------------------
- * OpConsulta  –  Buscar libros por texto (idéntica al admin opción 7)
- *--------------------------------------------------------------------------*/
 static void OpConsulta(CLIENT *clnt)
 {
     Cadena texto;
     char   campo;
-    int    ida = -1; /* usuario sin privilegios */
+    int    ida = -1;
 
     printf("\n Introduce el texto a Buscar: ");
     __fpurge(stdin);
@@ -645,9 +585,6 @@ static void OpConsulta(CLIENT *clnt)
     Pause;
 }
 
-/*---------------------------------------------------------------------------
- * OpPrestamo  –  Buscar, mostrar y prestar un libro
- *--------------------------------------------------------------------------*/
 static void OpPrestamo(CLIENT *clnt)
 {
     Cadena    texto;
@@ -685,7 +622,7 @@ static void OpPrestamo(CLIENT *clnt)
         scanf("%d", &pos);
 
         tpos.Ida = ida;
-        tpos.Pos = pos - 1; /* el usuario ve posiciones desde 1 */
+        tpos.Pos = pos - 1;
 
         res = prestar_1(&tpos, clnt);
         if (res == NULL) { clnt_perror(clnt, "Error RPC (Prestar)"); Pause; return; }
@@ -699,9 +636,6 @@ static void OpPrestamo(CLIENT *clnt)
     }
 }
 
-/*---------------------------------------------------------------------------
- * OpDevolucion  –  Buscar por ISBN (parcial), mostrar y devolver un libro
- *--------------------------------------------------------------------------*/
 static void OpDevolucion(CLIENT *clnt)
 {
     Cadena    texto;
@@ -717,7 +651,7 @@ static void OpDevolucion(CLIENT *clnt)
     scanf("%s", texto);
 
     printf("\n");
-    mostrados = BuscarYMostrar(clnt, ida, texto, 'i'); /* búsqueda siempre por Isbn */
+    mostrados = BuscarYMostrar(clnt, ida, texto, 'i'); //Busco siempre por ISBN
     if(mostrados==0)
     {
         printf("\n *** No se encoontraron libros para devolver.***\n");
@@ -734,7 +668,7 @@ static void OpDevolucion(CLIENT *clnt)
         scanf("%d", &pos);
 
         tpos.Ida = ida;
-        tpos.Pos = pos - 1; /* el usuario ve posiciones desde 1 */
+        tpos.Pos = pos - 1;
 
         res = devolver_1(&tpos, clnt);
         if (res == NULL) { clnt_perror(clnt, "Error RPC (Devolver)"); Pause; return; }
@@ -749,9 +683,6 @@ static void OpDevolucion(CLIENT *clnt)
     }
 }
 
-/*===========================================================================
- * Función principal
- *=========================================================================*/
 
 int main(int argc, char *argv[])
 {
@@ -764,15 +695,13 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    /* Crear la conexión RPC con el servidor */
+    //Conexión RCP
     clnt = clnt_create(argv[1], GESTORBIBLIOTECA, GESTORBIBLIOTECA_VER, "tcp");
     if (clnt == NULL)
     {
         clnt_pcreateerror(argv[1]);
         exit(EXIT_FAILURE);
     }
-
-    /* Bucle del menú principal */
     do
     {
         op = MenuPrincipal();
